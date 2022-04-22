@@ -14,26 +14,28 @@
 #include "Declare.h"
 #include "define.h"
 #include "channel.h"
+#include "IAcceptorCallBack.h"
+#include "Acceptor.h"
+#include "TcpConnection.h"
 using namespace std;
 
 #define MAX_LINE 100
 #define MAX_EVENTS 500
 #define MAX_LISTENFD 5
 
-class TcpServer:public IChannelCallBack{
+class TcpServer:public IAcceptorCallBack{
   public:
           TcpServer();
           ~TcpServer();
           void start();
-          virtual void OnIn(int sockfd);
+          virtual void newConnection(int sockfd);
   private:
-          int createAndListen();
           void update(Channel* pChannel,int op);
 
           int _epollfd;
-          int _sockfd;
           struct epoll_event _events[MAX_EVENTS];
-          map<int,Channel*> _channels;
+          map<int,TcpConnection*> _connections;
+          Acceptor* _pAcceptor;
 };
 
 #endif
