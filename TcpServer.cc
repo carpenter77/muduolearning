@@ -76,7 +76,9 @@ void TcpServer::start(){
     exit(1);
   }
   _sockfd=createAndListen(); 
-
+  Channel* pChannel=new Channel(_epollfd,_sockfd);
+  pChannel->setCallBack(this);
+  pChannel->enableReading();
 	for(;;){
 		vector<Channel*> channels;
     int fd=epoll_wait(_epollfd,_events,MAX_EVENTS,-1);
