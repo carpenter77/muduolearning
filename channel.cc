@@ -1,9 +1,9 @@
 #include<sys/epoll.h>
 #include<iostream>
 #include"channel.h"
-
-Channel::Channel(int epollfd,int sockfd)
-  :_epollfd(epollfd),
+#include "EventLoop.h"
+Channel::Channel(EventLoop* loop,int sockfd)
+  :_pLoop(loop),
     _sockfd(sockfd)
     ,_events(0)
     ,_revents(0)
@@ -24,14 +24,15 @@ void Channel::handleEvent(){
 int Channel::getSockfd(){
   return _sockfd;
 }
+int Channel::getEvents()
+{
+  return _events;
+}
 void Channel::enableReading()
 {
   _events|= EPOLLIN;
   update();
 }
 void Channel::update(){
-  struct epoll_event ev;
-  ev.data.ptr=this;
-  ev.events=_events;
-  epoll_ctl(_epollfd,EPOLL_CTL_ADD,_sockfd,&ev);
+    _pLoop->update(this);
 }

@@ -5,10 +5,11 @@
 #include "IChannelCallBack.h"
 #include "channel.h"
 #include "IAcceptorCallBack.h"
+#include "EventLoop.h"
 
 class Acceptor :public IChannelCallBack{
   public:
-          Acceptor(int epollfd);
+          Acceptor(EventLoop* pLoop);
           ~Acceptor();
 
           virtual void OnIn(int socket);
@@ -16,7 +17,7 @@ class Acceptor :public IChannelCallBack{
           void start();
   private:
           int createAndListen();
-          int _epollfd;
+          EventLoop *_pLoop;
           int _sockfd;
           Channel* _pAcceptorChannel;
           IAcceptorCallBack* _pCallBack;

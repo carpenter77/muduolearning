@@ -17,6 +17,9 @@
 #include "IAcceptorCallBack.h"
 #include "Acceptor.h"
 #include "TcpConnection.h"
+#include "IMuduoUser.h"
+#include "EventLoop.h"
+
 using namespace std;
 
 #define MAX_LINE 100
@@ -25,17 +28,17 @@ using namespace std;
 
 class TcpServer:public IAcceptorCallBack{
   public:
-          TcpServer();
+          TcpServer(EventLoop* pLoop);
           ~TcpServer();
           void start();
+          void setCallback(IMuduoUser* user); 
           virtual void newConnection(int sockfd);
   private:
-          void update(Channel* pChannel,int op);
-
-          int _epollfd;
           struct epoll_event _events[MAX_EVENTS];
           map<int,TcpConnection*> _connections;
           Acceptor* _pAcceptor;
+          EventLoop* _pLoop;
+          IMuduoUser* _user;
 };
 
 #endif

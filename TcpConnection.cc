@@ -3,7 +3,6 @@
 #include<arpa/inet.h>
 #include<unistd.h>
 #include<fcntl.h>
-
 #include "TcpConnection.h"
 #include "channel.h"
 #include "define.h"
@@ -11,11 +10,12 @@
 #include<iostream>
 using namespace std;
 
-TcpConnection::TcpConnection(int epollfd,int sockfd)
-        :_epollfd(epollfd),
-        _sockfd(sockfd)
+TcpConnection::TcpConnection(EventLoop* ploop,int sockfd)
+        :_pLoop(ploop),
+        _sockfd(sockfd),
+        _pUser(nullptr)
 {
-        _pChannel=new Channel(_epollfd,_sockfd);
+        _pChannel=new Channel(_pLoop,_sockfd);
         _pChannel->setCallBack(this);
         _pChannel->enableReading();
 }
@@ -38,9 +38,23 @@ void TcpConnection::OnIn(int sockfd){
              close(sockfd);
          }else{
              cout<<buf;
-             if(write(sockfd,buf,readlength)!=readlength){
-                 cout<<"error: not finished one time"<<endl;
-             }
+             string str(buf,MAX_LINE);
+             _pUser->onMessage(this,str);
         }
 
+}
+
+void TcpConnection::send(const string& msg){
+   int n=::write(_sockfd,msg.c_str(),msg.size());
+   if( n!=static_cast<int>(msg.size()) ){
+      cout<<"write error: "<<msg.size()-n<<" bytes left"<<endl;
+   }
+}
+void TcpConnection::connectEstablished(){
+  if(_pUser){
+    _pUser->onConnection(this);
+  }
+}
+void TcpConnection::setUser(IMuduoUser* user){
+  _pUser=user;
 }

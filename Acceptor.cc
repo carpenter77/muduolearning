@@ -8,8 +8,8 @@
 #include<iostream>
 using namespace std;
 
-Acceptor::Acceptor(int epollfd)
-        :_epollfd(epollfd),
+Acceptor::Acceptor(EventLoop* pLoop)
+        :_pLoop(pLoop),
         _sockfd(-1),
         _pAcceptorChannel(nullptr),
         _pCallBack(nullptr)
@@ -20,7 +20,7 @@ Acceptor::~Acceptor(){}
 void Acceptor::start()
 {
     _sockfd= createAndListen();
-    _pAcceptorChannel= new Channel(_epollfd, _sockfd); // Memory Leak !!!
+    _pAcceptorChannel= new Channel(_pLoop, _sockfd); // Memory Leak !!!
     _pAcceptorChannel->setCallBack(this);
     _pAcceptorChannel->enableReading();
 }
