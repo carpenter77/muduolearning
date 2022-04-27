@@ -12,8 +12,9 @@ class Acceptor :public IChannelCallBack{
           Acceptor(EventLoop* pLoop);
           ~Acceptor();
 
-          virtual void OnIn(int socket);
-          void setCallBack(IAcceptorCallBack* pCallBack);
+          virtual void handleRead();
+          virtual void handleWrite();
+         void setCallBack(IAcceptorCallBack* pCallBack);
           void start();
   private:
           int createAndListen();

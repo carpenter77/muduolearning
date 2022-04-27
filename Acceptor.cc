@@ -43,7 +43,7 @@ int Acceptor::createAndListen(){
   }
   return fd;
 }
-void Acceptor::OnIn(int socket){
+void Acceptor::handleRead(){
 			int connfd;
           struct sockaddr_in clientaddr;
           socklen_t addrlen=sizeof(struct sockaddr_in);
@@ -56,6 +56,8 @@ void Acceptor::OnIn(int socket){
           }
           fcntl(connfd,F_SETFL,O_NONBLOCK); //设置非阻塞连接
 		_pCallBack->newConnection(connfd);
+}
+void Acceptor::handleWrite(){
 }
 void Acceptor::setCallBack(IAcceptorCallBack* pCallBack){
 	_pCallBack=pCallBack;

@@ -5,9 +5,10 @@
 Channel::Channel(EventLoop* loop,int sockfd)
   :_pLoop(loop),
     _sockfd(sockfd)
-    ,_events(0)
+    ,_events(0),
+     _index(-1)
     ,_revents(0)
-    ,_callBack(NULL){
+    ,_callBack(nullptr){
 }
 void Channel::setCallBack(IChannelCallBack* callBack){
   _callBack=callBack;
@@ -18,7 +19,10 @@ void Channel::setRevents(int revents){
 
 void Channel::handleEvent(){
   if(_revents & EPOLLIN){
-    _callBack->OnIn(_sockfd);
+    _callBack->handleRead();
+  }
+  if(_revents & EPOLLOUT){
+    _callBack->handleWrite();
   }
 }
 int Channel::getSockfd(){
@@ -28,10 +32,29 @@ int Channel::getEvents()
 {
   return _events;
 }
+void Channel::setIndex(int index){
+  _index=index;
+}
+int Channel::getIndex(){
+  return _index;
+}
 void Channel::enableReading()
 {
   _events|= EPOLLIN;
   update();
+}
+void Channel::enableWriting()
+{
+  _events|= EPOLLOUT;
+  update();
+}
+void Channel::disableWriting()
+{
+  _events|= ~EPOLLOUT;
+  update();
+}
+bool Channel::isWriting(){
+  return _events| ~EPOLLOUT;
 }
 void Channel::update(){
     _pLoop->update(this);

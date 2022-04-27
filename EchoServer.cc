@@ -1,4 +1,7 @@
 #include "EchoServer.h"
+
+#define MESSAGE_LENGTH 8
+
 EchoServer::EchoServer(EventLoop* loop)
                   : _loop(loop),
                   _pServer(loop)
@@ -9,9 +12,10 @@ EchoServer::~EchoServer(){}
 void EchoServer::start(){
   _pServer.start();
 }
-void EchoServer::onMessage(TcpConnection* pConn,const string& data){
+void EchoServer::onMessage(TcpConnection* pConn,Buffer* buffer){
   cout<<"onmessage"<<endl;
-  pConn->send(data);
+  string message= buffer->retrieveAllAsString();
+  pConn->send(message);
 }
       
 void EchoServer::onConnection(TcpConnection* pCon)
@@ -19,3 +23,7 @@ void EchoServer::onConnection(TcpConnection* pCon)
   cout << "onConnection" << endl;
 }
 
+void EchoServer::onWriteComplete(TcpConnection* pCon)
+{
+  cout << "onWriteComplate" << endl;
+}

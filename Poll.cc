@@ -10,6 +10,9 @@
 #include "errno.h"
 #include<vector>
 
+const int kNew=-1;
+const int kAdd=1;
+
 Poll::Poll(){
 	 _epollfd=epoll_create(1);
     if(_epollfd<0){
@@ -34,9 +37,16 @@ void Poll::poll(vector<Channel*>* pChannels){
 }
 
 void Poll::update(Channel *pChannel){
+  int index=pChannel->getIndex();
 	struct epoll_event ev;
-	ev.data.ptr=pChannel;
+  ev.data.ptr=pChannel;
   ev.events=pChannel->getEvents();
   int fd=pChannel->getSockfd();
-  ::epoll_ctl(_epollfd,EPOLL_CTL_ADD,fd,&ev);
+
+  if(index==kNew){
+    pChannel->setIndex(1);
+    ::epoll_ctl(_epollfd,EPOLL_CTL_ADD,fd,&ev);
+  }else{
+     ::epoll_ctl(_epollfd,EPOLL_CTL_MOD,fd,&ev);
+  }
 }

@@ -6,9 +6,10 @@
 #include "EventLoop.h"
 #include "IAcceptorCallBack.h"
 #include <string>
+#include "IRun.h"
 #include "IMuduoUser.h"
 using namespace std;
-class TcpConnection: public IChannelCallBack{
+class TcpConnection: public IChannelCallBack,IRun{
   public:
           TcpConnection(EventLoop* pLoop,int sockfd);
           ~TcpConnection();
@@ -17,12 +18,16 @@ class TcpConnection: public IChannelCallBack{
           void connectEstablished();
           void setUser(IMuduoUser* puser);
 
-          virtual void OnIn(int sockfd);
+          virtual void handleRead();
+          virtual void handleWrite();
+          virtual void run();
   private:
         EventLoop *_pLoop;
         IMuduoUser* _pUser;
         int _sockfd;
         Channel* _pChannel;
+        Buffer _inBuf;
+        Buffer _outBuf;
 };
 
 #endif

@@ -13,9 +13,15 @@ class Channel{
           int getSockfd();
           int getEvents();
           void enableReading();
+          void setIndex(int index);
+          int getIndex();
+          void enableWriting();
+          void disableWriting();
+          bool isWriting();
   private:
           void update();
           int _epollfd;
+          int _index;
           int _sockfd;//
           int _events;//要关注的事件
           int _revents;//已经发生的事件
